@@ -5,7 +5,7 @@
 #include <thread>
 #include <windows.h>
 #include <chrono>
-#include <regex> 
+#include <regex>
 #include <iomanip>
 #include <ctime>
 #include <conio.h>
@@ -28,27 +28,45 @@ void exit_message();
 void refresh_screen()
 {
 #ifdef _WIN32
-    system("cls"); 
+    system("cls");
 #else
-    system("clear"); 
+    system("clear");
 #endif
+}
+bool isPhoneNumberRegistered(const string& phone, const string& blood_group) {
+    ifstream file(blood_group + ".txt");
+    if (!file.is_open()) {
+        return false; // If the file doesn't exist, the phone number can't be registered
+    }
+
+    string line;
+    while (getline(file, line)) {
+        size_t pos = line.find(',');
+        if (pos != string::npos) {
+            string existingPhone = line.substr(0, pos);
+            if (existingPhone == phone) {
+                return true; // Phone number found, already registered
+            }
+        }
+    }
+    return false; // Phone number not found, can register
 }
 string getHiddenPassword(const string& prompt) {
     string password;
     char ch;
     cout << prompt;
 
-    while ((ch = _getch()) != '\r') { 
-        if (ch == '\b' && !password.empty()) { 
-            password.pop_back(); 
+    while ((ch = _getch()) != '\r') {
+        if (ch == '\b' && !password.empty()) {
+            password.pop_back();
             cout << "\b \b";
         } else if (ch != '\b') {
             if (!password.empty()) {
-                
+
                 cout << "\b*";
             }
-            password += ch;  
-            cout << ch;      
+            password += ch;
+            cout << ch;
         }
     }
 
@@ -61,7 +79,7 @@ string getHiddenPassword(const string& prompt) {
 bool isPasswordValid(const string& password) {
     if (password.length() < 8) return false;
 
-    
+
     regex hasUppercase("[A-Z]");
     regex hasLowercase("[a-z]");
     regex hasSpecialChar("[^A-Za-z0-9]");
@@ -79,12 +97,12 @@ bool choice_menu()
     cout << "Enter your choice (1/2): ";
     cin >> choice;
 
-    return (choice == 1); 
+    return (choice == 1);
 }
 
 
 bool isValidEmail(const string& email) {
-    
+
     const regex pattern("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
     return regex_match(email, pattern);
 }
@@ -97,7 +115,7 @@ void join_red_army(string blood_group, string phone) {
     string lastDonationTime = "N/A";
     bool hasDisease;
 
-   
+
     do {
         cout << "\t\t\t\t\tEnter your email address: ";
         cin >> email;
@@ -105,7 +123,7 @@ void join_red_army(string blood_group, string phone) {
         if (!isValidEmail(email)) {
             cout << "\t\t\t\t\tInvalid email format. Please try again.\n";
         } else {
-            
+
             ifstream checkFile(blood_group + ".txt");
             string line;
             bool emailExists = false;
@@ -126,7 +144,7 @@ void join_red_army(string blood_group, string phone) {
         }
     } while (true);
 
-    
+
     do {
         cout << "\t\t\t\t\tEnter your age: ";
         cin >> age;
@@ -164,7 +182,7 @@ void join_red_army(string blood_group, string phone) {
             cout << "\t\t\t\t\tWhen was your last donation? (YYYY-MM-DD): ";
             getline(cin, lastDonationTime);
 
-            
+
             regex datePattern("\\d{4}-\\d{2}-\\d{2}");
             validDate = regex_match(lastDonationTime, datePattern);
             if (!validDate) {
@@ -173,7 +191,7 @@ void join_red_army(string blood_group, string phone) {
         } while (!validDate);
     }
 
-   
+
     cout << "\t\t\t\t\tPlease answer the following health questions:\n\n";
 
     bool hasAnyDisease = false;
@@ -212,7 +230,7 @@ void join_red_army(string blood_group, string phone) {
             string storedPhone = line.substr(0, pos);
 
             if (storedPhone == phone) {
-                
+
                 size_t lastComma = line.find_last_of(",");
                 string baseInfo = line.substr(0, lastComma + 1);
 
@@ -271,9 +289,9 @@ bool hasJoinedRedArmy(const string& blood_group, const string& phone) {
         string storedPhone = line.substr(0, pos);
 
         if (storedPhone == phone) {
-         
+
             int commaCount = count(line.begin(), line.end(), ',');
-            return commaCount > 3;  
+            return commaCount > 3;
         }
     }
     return false;
@@ -287,7 +305,7 @@ void update_profile(const string& blood_group, const string& phone) {
     cout << "\t\t\t\t\t*            Update Profile             *\n";
     cout << "\t\t\t\t\t*****************************************\n\n";
 
-    
+
     vector<string> lines;
     string line;
     bool user_found = false;
@@ -301,7 +319,7 @@ void update_profile(const string& blood_group, const string& phone) {
         return;
     }
 
-    
+
     while (getline(file, line)) {
         size_t pos = line.find(",");
         string stored_phone = line.substr(0, pos);
@@ -358,7 +376,7 @@ void update_profile(const string& blood_group, const string& phone) {
             cout << "\t\t\t\t\tEnter new email: ";
             getline(cin, new_value);
             if (isValidEmail(new_value)) {
-                current_info[4-1] = new_value; 
+                current_info[4-1] = new_value;
                 update_successful = true;
             } else {
                 cout << "\t\t\t\t\tInvalid email format.\n";
@@ -369,7 +387,7 @@ void update_profile(const string& blood_group, const string& phone) {
             cout << "\t\t\t\t\tEnter new age: ";
             getline(cin, new_value);
             if (stoi(new_value) >= 18 && stoi(new_value) <= 65) {
-                current_info[5-1] = new_value; 
+                current_info[5-1] = new_value;
                 update_successful = true;
             } else {
                 cout << "\t\t\t\t\tInvalid age. Must be between 18 and 65.\n";
@@ -379,8 +397,8 @@ void update_profile(const string& blood_group, const string& phone) {
         case 3: {
             cout << "\t\t\t\t\tEnter new weight: ";
             getline(cin, new_value);
-            if (stoi(new_value) >= 50) { 
-                current_info[6-1] = new_value; 
+            if (stoi(new_value) >= 50) {
+                current_info[6-1] = new_value;
                 update_successful = true;
             } else {
                 cout << "\t\t\t\t\tInvalid weight. Must be at least 50 kg.\n";
@@ -390,10 +408,10 @@ void update_profile(const string& blood_group, const string& phone) {
         case 4: {
             cout << "\t\t\t\t\tEnter new last donation date (YYYY-MM-DD): ";
             getline(cin, new_value);
-            
+
             regex datePattern("\\d{4}-\\d{2}-\\d{2}");
             if (regex_match(new_value, datePattern)) {
-                current_info[8-1] = new_value; 
+                current_info[8-1] = new_value;
                 update_successful = true;
             } else {
                 cout << "\t\t\t\t\tInvalid date format. Please use YYYY-MM-DD.\n";
@@ -404,7 +422,7 @@ void update_profile(const string& blood_group, const string& phone) {
             cout << "\t\t\t\t\tEnter new eligibility status (Yes/No): ";
             getline(cin, new_value);
             if (new_value == "Yes" || new_value == "No") {
-                current_info[9-1] = new_value; 
+                current_info[9-1] = new_value;
                 update_successful = true;
             } else {
                 cout << "\t\t\t\t\tInvalid input. Please enter 'Yes' or 'No'.\n";
@@ -429,7 +447,7 @@ void update_profile(const string& blood_group, const string& phone) {
         vector<string> updated_lines;
         while (getline(read_file, line)) {
             if (line.find(phone + ",") == 0) {
-                
+
                 string updated_line = "";
                 for (size_t i = 0; i < current_info.size(); i++) {
                     updated_line += current_info[i];
@@ -444,7 +462,7 @@ void update_profile(const string& blood_group, const string& phone) {
         }
         read_file.close();
 
-        
+
         ofstream write_file(blood_group + ".txt");
         for (const string& updated_line : updated_lines) {
             write_file << updated_line << endl;
@@ -462,48 +480,82 @@ void update_profile(const string& blood_group, const string& phone) {
 //
 
 bool isEligibleDonor(const string& last_donation_date) {
-    
+
     int year, month, day;
-    char dash1, dash2; 
+    char dash1, dash2;
     stringstream date_stream(last_donation_date);
     date_stream >> year >> dash1 >> month >> dash2 >> day;
 
-    
+
     tm last_donation_tm = {};
-    last_donation_tm.tm_year = year - 1900; 
-    last_donation_tm.tm_mon = month - 1;    
+    last_donation_tm.tm_year = year - 1900;
+    last_donation_tm.tm_mon = month - 1;
     last_donation_tm.tm_mday = day;
 
-    
+
     time_t last_donation_time = mktime(&last_donation_tm);
 
-    
+
     time_t current_time = time(nullptr);
 
-    
-    double seconds_diff = difftime(current_time, last_donation_time);
-    int days_diff = seconds_diff / (60 * 60 * 24); 
 
-    
+    double seconds_diff = difftime(current_time, last_donation_time);
+    int days_diff = seconds_diff / (60 * 60 * 24);
+
+
     return days_diff >= 120;
+}
+void displayBloodGroupMenu() {
+    cout << "\n\t\t\t\t   -----------------------------------------\n";
+    cout << "\t\t\t\t   *          Search Blood Donors          *\n";
+    cout << "\t\t\t\t   -----------------------------------------\n";
+    cout << "\t\t\t\t\t-------------------------------\n";
+    cout << "\t\t\t\t\t*   Select the Blood Group    *\n";
+    cout << "\t\t\t\t\t-------------------------------\n";
+    cout << "\t\t\t\t\t*   No   |   Blood Group      *\n";
+    cout << "\t\t\t\t\t-------------------------------\n";
+    cout << "\t\t\t\t\t*   1    |     A+             *\n";
+    cout << "\t\t\t\t\t*   2    |     A-             *\n";
+    cout << "\t\t\t\t\t*   3    |     B+             *\n";
+    cout << "\t\t\t\t\t*   4    |     B-             *\n";
+    cout << "\t\t\t\t\t*   5    |     AB+            *\n";
+    cout << "\t\t\t\t\t*   6    |     AB-            *\n";
+    cout << "\t\t\t\t\t*   7    |     O+             *\n";
+    cout << "\t\t\t\t\t*   8    |     O-             *\n";
+    cout << "\t\t\t\t\t-------------------------------\n";
 }
 
 void search_donor(const string user_phone) {
+      int blood_group_choice;
     string blood_group;
-    cout << "\n\t\t\t\t-----------------------------------------\n";
-    cout << "\t\t\t\t\t*          Search Blood Donors          *\n";
-    cout << "\t\t\t\t\t-----------------------------------------n\n";
 
-    cout << "\t\t\t\t\tEnter the blood group you are looking for (e.g., A+, B-, O+): ";
-    cin >> blood_group;
+    displayBloodGroupMenu();
 
-    
+    // Prompt user to select a blood group
+    do {
+        cout << "Enter the number corresponding to the blood group: ";
+        cin >> blood_group_choice;
+
+        switch (blood_group_choice) {
+            case 1: blood_group = "A+"; break;
+            case 2: blood_group = "A-"; break;
+            case 3: blood_group = "B+"; break;
+            case 4: blood_group = "B-"; break;
+            case 5: blood_group = "AB+"; break;
+            case 6: blood_group = "AB-"; break;
+            case 7: blood_group = "O+"; break;
+            case 8: blood_group = "O-"; break;
+            default:
+                cout << "Invalid choice. Please select a valid number between 1 and 8.\n";
+        }
+    } while (blood_group.empty());
+
     ifstream file(blood_group + ".txt");
     if (!file.is_open()) {
+        refresh_screen();
         cout << "\n\t\t\t\t\tError: Unable to access donor records for blood group " << blood_group << ".\n";
         return;
     }
-
     vector<vector<string>> eligible_donors;
     string line;
 
@@ -525,7 +577,7 @@ void search_donor(const string user_phone) {
     }
     file.close();
 
-    
+
     if (eligible_donors.empty()) {
         refresh_screen();
         cout << "\t\t\t\t\t____________________________________________________________\n";
@@ -537,6 +589,7 @@ void search_donor(const string user_phone) {
         cout << "\t\t\t\t\t____________________________________________________________\n";
         cout << "\t\t\t\t\t     Eligible donors found for         \n";
         cout << "\t\t\t\t\t     Blood Group: " << setw(10) << left << blood_group << "            \n";
+        cout << "\t\t\t\t\t     Total Eligible Donors: " << eligible_donors.size() << "\n";
         cout << "\t\t\t\t\t____________________________________________________________\n";
 
         // Display each donor in a separate box
@@ -586,19 +639,19 @@ void register_user()
     cout << "\t\t\t\t\t*   No   |   Blood Group      *\n";
     cout << "\t\t\t\t\t-------------------------------\n";
     cout << "\t\t\t\t\t*   1    |     " << setw(5) << "A+" << "          *\n";
-    cout << "\t\t\t\t\t-------------------------------\n";
+    //cout << "\t\t\t\t\t-------------------------------\n";
     cout << "\t\t\t\t\t*   2    |     " << setw(5) << "A-" << "          *\n";
-    cout << "\t\t\t\t\t-------------------------------\n";
+    //cout << "\t\t\t\t\t-------------------------------\n";
     cout << "\t\t\t\t\t*   3    |     " << setw(5) << "B+" << "          *\n";
-    cout << "\t\t\t\t\t-------------------------------\n";
+    //cout << "\t\t\t\t\t-------------------------------\n";
     cout << "\t\t\t\t\t*   4    |     " << setw(5) << "B-" << "          *\n";
-    cout << "\t\t\t\t\t-------------------------------\n";
+    //cout << "\t\t\t\t\t-------------------------------\n";
     cout << "\t\t\t\t\t*   5    |     " << setw(6) << "AB+" << "         *\n";
-    cout << "\t\t\t\t\t--------------------------------\n";
+    //cout << "\t\t\t\t\t--------------------------------\n";
     cout << "\t\t\t\t\t*   6    |     " << setw(6) << "AB-" << "         *\n";
-    cout << "\t\t\t\t\t--------------------------------\n";
+    //cout << "\t\t\t\t\t--------------------------------\n";
     cout << "\t\t\t\t\t*   7    |     " << setw(5) << "O+" << "          *\n";
-    cout << "\t\t\t\t\t--------------------------------\n";
+    //cout << "\t\t\t\t\t--------------------------------\n";
     cout << "\t\t\t\t\t*   8    |     " << setw(5) << "O-" << "          *\n";
     cout << "\t\t\t\t\t--------------------------------\n";
 
@@ -644,19 +697,30 @@ void register_user()
     getline(cin, name);
 
     // Validate phone number
-    do
-    {
-        cout << "Enter your phone (01897911901): ";
+        // Get phone number and check for duplicates
+    do {
+
+        cout << "Enter your phone (01xxxxxxxxx): ";
         cin >> phone;
 
-        if (phone.length() != 11 || !regex_match(phone, regex("[0-9]+")))
-        {
+        if (phone.length() != 11 || !regex_match(phone, regex("[0-9]+"))) {
             cout << "Invalid phone number. Please enter exactly 11 digits.\n";
         }
-    } while (phone.length() != 11 || !regex_match(phone, regex("[0-9]+")));
+        else if (phone.substr(0, 2) != "01") {
+        cout << "Phone number must start with '01'.\n";
+        }
+        else if (isPhoneNumberRegistered(phone, blood_group)) {
+            cout << "This phone number is already registered. Please use a different number.\n";
+        }
+        else {
+            break; // Valid and not registered
+        }
+
+    } while (true);
 
     // Validate password
     do {
+
         // Step 1: Enter password
         password = getHiddenPassword("Enter password: ");
 
@@ -676,12 +740,13 @@ void register_user()
             isValid = true;
             cout << "Password confirmed and valid!" << endl;
         }
+
     } while (!isValid);
 
 
     // Save to file
     ofstream file(blood_group + ".txt", ios::app);
-    file << phone << "," << password << "," << name << "," << blood_group << endl;
+    file << phone << "," << password << "," << name << "," << blood_group << "\n";
     file.close();
 
     refresh_screen();
@@ -694,17 +759,17 @@ void register_user()
     cout << "\t\t\t\t\t\t **********************\n";
     cout << "\t\t\t\t\t\t *    Your Details    *\n";
     cout << "\t\t\t\t\t*****************************************\n";
-    cout << "\t\t\t\t\t* Name         |    " << setw(20) << left << name << "*\n";
+    cout << "\t\t\t\t\t* Name         :    " << setw(20) << left << name << "*\n";
     cout << "\t\t\t\t\t*                                       *\n";
-    cout << "\t\t\t\t\t*****************************************\n";
-    cout << "\t\t\t\t\t* Phone        |    " << setw(20) << left << phone << "*\n";
+    //cout << "\t\t\t\t\t*****************************************\n";
+    cout << "\t\t\t\t\t* Phone        :    " << setw(20) << left << phone << "*\n";
     cout << "\t\t\t\t\t*                                       *\n";
-    cout << "\t\t\t\t\t*****************************************\n";
-    cout << "\t\t\t\t\t* Blood Group  |    " << setw(20) << left << blood_group << "*\n";
+    //cout << "\t\t\t\t\t*****************************************\n";
+    cout << "\t\t\t\t\t* Blood Group  :    " << setw(20) << left << blood_group << "*\n";
     cout << "\t\t\t\t\t*                                       *\n";
     cout << "\t\t\t\t\t*****************************************\n\n";
 
-    Sleep(10000);
+    Sleep(4000);
     refresh_screen();
     entry_dashboard();
 }
@@ -888,23 +953,23 @@ label3:
     // Display blood group selection
     cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   Select your blood group   *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   No   |   Blood Group      *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   1    |     " << setw(5) << "A+" << "          *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   2    |     " << setw(5) << "A-" << "          *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   3    |     " << setw(5) << "B+" << "          *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   4    |     " << setw(5) << "B-" << "          *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   5    |     " << setw(6) << "AB+" << "         *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   6    |     " << setw(6) << "AB-" << "         *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   7    |     " << setw(5) << "O+" << "          *\n";
-    cout << "\t\t\t\t\t*******************************\n";
+    //cout << "\t\t\t\t\t*******************************\n";
     cout << "\t\t\t\t\t*   8    |     " << setw(5) << "O-" << "          *\n";
     cout << "\t\t\t\t\t*******************************\n";
 
